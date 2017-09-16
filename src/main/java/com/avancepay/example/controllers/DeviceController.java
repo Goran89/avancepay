@@ -1,7 +1,6 @@
 package com.avancepay.example.controllers;
 
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
@@ -17,9 +16,6 @@ import com.avancepay.example.model.DeviceData;
 
 @Component("deviceController")
 public class DeviceController {
-	
-//	@Autowired
-//	private Environment env;
 	
 	@Autowired
 	@Qualifier("deviceDao")

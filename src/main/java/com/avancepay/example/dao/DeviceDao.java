@@ -18,35 +18,14 @@ public class DeviceDao {
 	public List<DeviceData> getDaoDeviceData(Integer locationNumberBiggerThan, Integer locationNumberLessOrEqualThan,
 			String nameStartsWith, String nameEndsWith, String nameContains) {
 		List<DeviceData> deviceList = new LinkedList<DeviceData>();
-		String query = "SELECT * FROM DEVICE";
 		// dynamic query creation
-		boolean isDynamicCreated = false;
-		if(locationNumberBiggerThan != null || locationNumberLessOrEqualThan != null
-			|| nameStartsWith != null || nameEndsWith != null || nameContains != null) {
-			query = query + " WHERE ";
-			isDynamicCreated = true;
-		}
-		if(locationNumberBiggerThan != null){
-			query = query + " LOCATIONNUMBER  > '" + locationNumberBiggerThan + "' AND ";
-		}
-		if(locationNumberLessOrEqualThan != null){
-			query = query + " LOCATIONNUMBER  <= '" + locationNumberLessOrEqualThan + "' AND ";
-		}
-		if(nameStartsWith != null){
-			query = query + " NAME LIKE '" + nameStartsWith + "%' AND ";
-		}
-		if(nameEndsWith != null){
-			query = query + " NAME LIKE '%" + nameEndsWith + "' AND ";
-		}
-		if(nameContains != null){
-			query = query + " NAME LIKE '%" + nameContains + "%' AND ";
-		}
-		if(isDynamicCreated){
-			query = query.substring(0, query.length() - 5);
-		}
+		StringBuilder query = new StringBuilder();
+		query.append(createDynamicQuery(locationNumberBiggerThan, locationNumberLessOrEqualThan, nameStartsWith,
+				nameEndsWith, nameContains));
 		// execute Query
 		Session session = HibernateUtil.getSessionFactory().openSession();
-		SQLQuery sqlQuery = session.createSQLQuery(query);
+		SQLQuery sqlQuery = session.createSQLQuery(query.toString());
+		@SuppressWarnings("rawtypes")
 		List listResult = sqlQuery.list();
 		for(int i = 0; i < listResult.size(); i++){
 			Object[] devRes = (Object[]) listResult.get(i);
@@ -57,15 +36,38 @@ public class DeviceDao {
 			dev.setLocationNumber((Integer)devRes[2]);
 			deviceList.add(dev);
 		}
-		/*Iterator resultIterator = queryResult.iterate();
-		while(resultIterator.hasNext()){
-			DeviceData devRes = (DeviceData) resultIterator.next();
-			DeviceData dev = new DeviceData();
-			dev.setId(devRes.getId());
-			deviceList.add(dev);
-		}*/
 		return deviceList;
-//		return new LinkedList<DeviceData>();
+	}
+
+	private StringBuilder createDynamicQuery(Integer locationNumberBiggerThan, Integer locationNumberLessOrEqualThan,
+			String nameStartsWith, String nameEndsWith, String nameContains) {
+		boolean isDynamicCreated = false;
+		StringBuilder query = new StringBuilder("SELECT * FROM DEVICE");
+		if(locationNumberBiggerThan != null || locationNumberLessOrEqualThan != null
+			|| nameStartsWith != null || nameEndsWith != null || nameContains != null) {
+			query.append(" WHERE ");
+			isDynamicCreated = true;
+		}
+		if(locationNumberBiggerThan != null){
+			query.append(" LOCATIONNUMBER  > '" + locationNumberBiggerThan + "' AND ");
+		}
+		if(locationNumberLessOrEqualThan != null){
+			query.append(" LOCATIONNUMBER  <= '" + locationNumberLessOrEqualThan + "' AND ");
+		}
+		if(nameStartsWith != null){
+			query.append(" NAME LIKE '" + nameStartsWith + "%' AND ");
+		}
+		if(nameEndsWith != null){
+			query.append(" NAME LIKE '%" + nameEndsWith + "' AND ");
+		}
+		if(nameContains != null){
+			query.append(" NAME LIKE '%" + nameContains + "%' AND ");
+		}
+		if(isDynamicCreated){
+			return new StringBuilder(query.substring(0, query.length() - 5));
+		} else {
+			return query;
+		}
 	}
 
 }
