@@ -2,6 +2,8 @@ package com.avancepay.example.avancepay;
 
 import java.util.Date;
 
+import javax.annotation.PreDestroy;
+
 import org.hibernate.Session;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -26,6 +28,11 @@ public class AvancePayApplication {
 		dev.setName("AvancePay");
 		session.save(dev);
 		session.getTransaction().commit();
-		//HibernateUtil.shutdown();
+	}
+	
+	@PreDestroy
+	public void databaseShutDown() {
+		System.out.println("Spring Container is destroy! In memory DB shut down");
+		HibernateUtil.shutdown();
 	}
 }
